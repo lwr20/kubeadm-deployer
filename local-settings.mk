@@ -1,0 +1,4 @@
+NUM_CLIENTS=2
+PREFIX=lwr-kubetest
+SERVER_INSTANCE_TYPE=n1-standard-1
+CLIENT_INSTANCE_TYPE=n1-standard-1
