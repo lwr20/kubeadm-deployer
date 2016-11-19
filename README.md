@@ -18,12 +18,8 @@ These instructions have been tested on Ubuntu 16.04.  They are likely to work wi
 
 ## Running tests
 
-Once you've got a rig set up, ssh into the server and run:
-`kubeadm init`
-This will setup the master.  Make a record of the `kubeadm join` command that kubeadm init outputs. You will need this in a moment. The key included here is secret, keep it safe — anyone with this key can add authenticated nodes to your cluster.
-
-Paste that command into your nodes.
-
 Finally, install calico with:
-`kubectl apply -f http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/k8s-backend/calico.yaml`
-
+- For etcdless:
+    `kubectl apply -f http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/k8s-backend/calico.yaml`
+- For normal self-hosted:
+    `kubectl apply -f http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml`
