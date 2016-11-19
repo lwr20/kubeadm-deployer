@@ -19,8 +19,9 @@ TOKEN := $(shell ./tokengen.sh)
 gce-create:
 	$(MAKE) --no-print-directory deploy-master
 	$(MAKE) --no-print-directory deploy-clients
-	sleep 10
+	sleep 60
 	$(MAKE) --no-print-directory gce-make-cluster
+	$(MAKE) --no-print-directory gce-forward-ports
 
 master-install.sh:
 	cat "master-install-template.sh" | \
@@ -65,11 +66,31 @@ gce-make-cluster:
 	echo "Waiting for join of nodes to finish..."; \
 	wait; \
 	echo "nodes joined."
-	gcloud compute ssh $(PREFIX)-master -- ⁠⁠⁠⁠kubectl apply -f http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml
+	gcloud compute ssh $(PREFIX)-master -- kubectl apply -f http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml
 
 gce-cleanup:
 	gcloud compute instances list --zones $(GCE_REGION) -r '$(PREFIX).*' | \
 	  tail -n +2 | cut -f1 -d' ' | xargs gcloud compute instances delete --zone $(GCE_REGION)
+
+gce-forward-ports:
+	@-pkill -f '8080:localhost:8080'
+	bash -c 'until gcloud compute ssh $(PREFIX)-master -- date; do echo "Trying to forward ports"; sleep 1; done'
+	gcloud compute ssh core@$(PREFIX)-master -- \
+	-o PasswordAuthentication=no \
+	-o UserKnownHostsFile=/dev/null \
+	-o StrictHostKeyChecking=no \
+	-L 8080:localhost:8080 \
+	-L 2379:localhost:2379 \
+	-L 4194:localhost:4194 \
+	-L 9090:$(PREFIX)-prom:9090 \
+	-L 3000:$(PREFIX)-prom:3000 \
+	-o LogLevel=quiet -nNT &
+	@echo
+	@echo "Forwarded ports:"
+	@echo "- Grafana dashboard at http://localhost:3000/dashboard/file/grafana-dash.json"
+	@echo "- Prometheus at http://localhost:9090/"
+	@echo "- Kubernetes' etcd at http://localhost:2379/"
+	@echo "- Kubernetes' API at http://localhost:8080/"
 
 clean:
 	$(MAKE) --no-print-directory gce-cleanup
