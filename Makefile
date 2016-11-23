@@ -7,7 +7,7 @@ MASTER_IMAGE_NAME:=ubuntu-1604-xenial-v20161020
 CLIENT_IMAGE_NAME:=ubuntu-1604-xenial-v20161020
 NUM_CLIENTS:=2
 PREFIX:=kubetest
-MASTER_INSTANCE_TYPE:=n1-standard-1
+MASTER_INSTANCE_TYPE:=n1-standard-4
 CLIENT_INSTANCE_TYPE:=n1-standard-1
 
 -include local-settings.mk
@@ -66,6 +66,8 @@ gce-make-cluster:
 	echo "Waiting for join of nodes to finish..."; \
 	wait; \
 	echo "nodes joined."
+
+gce-apply-calico:
 	gcloud compute ssh $(PREFIX)-master -- kubectl apply -f http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml
 
 gce-cleanup:
