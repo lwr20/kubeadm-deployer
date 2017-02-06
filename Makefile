@@ -9,19 +9,23 @@ NUM_CLIENTS:=2
 PREFIX:=kubetest
 MASTER_INSTANCE_TYPE:=n1-standard-4
 CLIENT_INSTANCE_TYPE:=n1-standard-1
-
+# CALICO_URL:=http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml
+CALICO_URL:=http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/k8s-backend/calico.yaml
 -include local-settings.mk
 
-NODE_NUMBERS := $(shell seq -f '%02.0f' 1 $(NUM_CLIENTS))
-NODE_NAMES := $(addprefix $(PREFIX)-,$(NODE_NUMBERS))
-TOKEN := $(shell ./tokengen.sh)
+NODE_NUMBERS:=$(shell seq -f '%02.0f' 1 $(NUM_CLIENTS))
+NODE_NAMES:=$(addprefix $(PREFIX)-,$(NODE_NUMBERS))
+TOKEN=$(shell cat token)
+
+token:
+	echo "Creating token"
+	TOKEN=$(shell ./tokengen.sh | tee token)
 
 gce-create:
 	$(MAKE) --no-print-directory deploy-master
 	$(MAKE) --no-print-directory deploy-clients
 	sleep 60
 	$(MAKE) --no-print-directory gce-make-cluster
-	$(MAKE) --no-print-directory gce-forward-ports
 
 master-install.sh:
 	cat "master-install-template.sh" | \
@@ -56,9 +60,12 @@ deploy-clients: client-config.sh
 		wait && \
 		echo "Worker nodes created.";'
 
-gce-make-cluster:
+create-master: token
 	@echo Token is: $(TOKEN)
-	gcloud compute ssh $(PREFIX)-master -- sudo kubeadm init --token=$(TOKEN)
+	gcloud compute ssh $(PREFIX)-master -- sudo kubeadm init --token=$(TOKEN) --pod-network-cidr=10.244.0.0/16
+
+join-nodes: token
+	@echo Token is: $(TOKEN)
 	for NODE in ${NODE_NAMES}; do \
 	  echo "Joining $$NODE"; \
 	  gcloud compute ssh $$NODE -- sudo kubeadm join --token=$(TOKEN) $(PREFIX)-master & \
@@ -67,8 +74,12 @@ gce-make-cluster:
 	wait; \
 	echo "nodes joined."
 
+gce-make-cluster: token
+	$(MAKE) --no-print-directory create-master
+	$(MAKE) --no-print-directory join-nodes
+
 gce-apply-calico:
-	gcloud compute ssh $(PREFIX)-master -- kubectl apply -f http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml
+	gcloud compute ssh $(PREFIX)-master -- kubectl apply -f $(CALICO_URL)
 
 gce-cleanup:
 	gcloud compute instances list --zones $(GCE_REGION) -r '$(PREFIX).*' | \
@@ -96,4 +107,4 @@ gce-forward-ports:
 
 clean:
 	$(MAKE) --no-print-directory gce-cleanup
-	rm -f master-install.sh client-config.sh
+	rm -f master-install.sh client-config.sh token

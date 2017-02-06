@@ -1,3 +1,7 @@
 .idea
 client-config.sh
 master-install.sh
+*.yaml
+calicoctl
+local-settings.mk
+token
