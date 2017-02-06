@@ -1,0 +1,5 @@
+NUM_CLIENTS=2
+PREFIX=tigera-lwr-kubetest
+MASTER_INSTANCE_TYPE:=n1-standard-4
+CLIENT_INSTANCE_TYPE=n1-highmem-4
+CALICO_URL=http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml

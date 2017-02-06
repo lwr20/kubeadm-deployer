@@ -1,4 +1,0 @@
-NUM_CLIENTS=2
-PREFIX=lwr-kubetest
-MASTER_INSTANCE_TYPE:=n1-standard-4
-CLIENT_INSTANCE_TYPE=n1-standard-4
