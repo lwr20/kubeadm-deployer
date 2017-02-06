@@ -10,7 +10,7 @@ PREFIX:=kubetest
 MASTER_INSTANCE_TYPE:=n1-standard-4
 CLIENT_INSTANCE_TYPE:=n1-standard-1
 # CALICO_URL:=http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml
-CALICO_URL:=http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/k8s-backend/calico.yaml
+CALICO_URL:=http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml
 -include local-settings.mk
 
 NODE_NUMBERS:=$(shell seq -f '%02.0f' 1 $(NUM_CLIENTS))
