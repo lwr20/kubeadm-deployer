@@ -1,25 +1,25 @@
 # Parameters for the cluster, don't edit these directly, put your changes in
 # local-settings.mk.
 
-GCE_REGION:=us-central1-f
-GCE_PROJECT:=unique-caldron-775
-MASTER_IMAGE_NAME:=ubuntu-1604-xenial-v20161020
-CLIENT_IMAGE_NAME:=ubuntu-1604-xenial-v20161020
-NUM_CLIENTS:=2
-PREFIX:=kubetest
-MASTER_INSTANCE_TYPE:=n1-standard-4
-CLIENT_INSTANCE_TYPE:=n1-standard-1
+GCE_REGION?=us-central1-f
+GCE_PROJECT?=unique-caldron-775
+MASTER_IMAGE_NAME?=ubuntu-1604-xenial-v20161020
+CLIENT_IMAGE_NAME?=ubuntu-1604-xenial-v20161020
+NUM_CLIENTS?=2
+PREFIX?=kubetest
+MASTER_INSTANCE_TYPE?=n1-standard-4
+CLIENT_INSTANCE_TYPE?=n1-standard-1
 # CALICO_URL:=http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml
-CALICO_URL:=http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml
+CALICO_URL?=http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml
 -include local-settings.mk
 
 NODE_NUMBERS:=$(shell seq -f '%02.0f' 1 $(NUM_CLIENTS))
 NODE_NAMES:=$(addprefix $(PREFIX)-,$(NODE_NUMBERS))
-TOKEN=$(shell cat token)
+TOKEN?=$(shell cat token)
 
 token:
 	echo "Creating token"
-	TOKEN=$(shell ./tokengen.sh | tee token)
+	TOKEN:=$(shell ./tokengen.sh | tee token)
 
 gce-create:
 	$(MAKE) --no-print-directory deploy-master
