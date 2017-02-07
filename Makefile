@@ -19,7 +19,7 @@ TOKEN?=$(shell cat token)
 
 token:
 	echo "Creating token"
-	TOKEN:=$(shell ./tokengen.sh | tee token)
+	TOKEN=$(shell ./tokengen.sh | tee token)
 
 gce-create:
 	$(MAKE) --no-print-directory deploy-master
