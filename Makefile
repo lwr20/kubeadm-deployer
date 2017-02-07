@@ -9,13 +9,16 @@ NUM_CLIENTS?=2
 PREFIX?=kubetest
 MASTER_INSTANCE_TYPE?=n1-standard-4
 CLIENT_INSTANCE_TYPE?=n1-standard-1
-# CALICO_URL:=http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml
-CALICO_URL?=http://docs.projectcalico.org/v2.0/getting-started/kubernetes/installation/hosted/kubeadm/calico.yaml
+KDD?=false
 -include local-settings.mk
 
 NODE_NUMBERS:=$(shell seq -f '%02.0f' 1 $(NUM_CLIENTS))
 NODE_NAMES:=$(addprefix $(PREFIX)-,$(NODE_NUMBERS))
 TOKEN?=$(shell cat token)
+
+CNI_VERSION = v1.5.6
+NODE_VERSION = v2.1.0-rc3
+POLICY_VERSION = v0.5.2   # Not used for KDD
 
 token:
 	echo "Creating token"
@@ -26,6 +29,17 @@ gce-create:
 	$(MAKE) --no-print-directory deploy-clients
 	sleep 60
 	$(MAKE) --no-print-directory gce-make-cluster
+
+calico.yaml:
+	if [ $(KDD) = "true" ]; \
+	then cat "calico-kdd.template.yaml" | \
+	  sed "s~__NODE_VERSION__~$(NODE_VERSION)~g" | \
+	  sed "s~__CNI_VERSION__~$(CNI_VERSION)~g" > $@; \
+	else cat "calico-etcd.template.yaml" | \
+	  sed "s~__NODE_VERSION__~$(NODE_VERSION)~g" | \
+	  sed "s~__POLICY_VERSION__~$(POLICY_VERSION)~g" | \
+	  sed "s~__CNI_VERSION__~$(CNI_VERSION)~g" > $@; \
+	fi
 
 master-install.sh:
 	cat "master-install-template.sh" | \
@@ -79,7 +93,12 @@ gce-make-cluster: token
 	$(MAKE) --no-print-directory join-nodes
 
 gce-apply-calico:
-	gcloud compute ssh $(PREFIX)-master -- kubectl apply -f $(CALICO_URL)
+	gcloud compute copy-files calico.yaml $(PREFIX)-master:~/calico.yaml
+	gcloud compute ssh $(PREFIX)-master -- kubectl apply -f ~/calico.yaml
+	if [ $(KDD) = "true" ]; \
+	  then gcloud compute ssh $(PREFIX)-master -- \
+	  kubectl create -f https://github.com/coreos/flannel/blob/master/Documentation/kube-flannel.yml?raw=true"; \
+	fi
 
 gce-cleanup:
 	gcloud compute instances list --zones $(GCE_REGION) -r '$(PREFIX).*' | \
@@ -107,4 +126,4 @@ gce-forward-ports:
 
 clean:
 	$(MAKE) --no-print-directory gce-cleanup
-	rm -f master-install.sh client-config.sh token
+	rm -f master-install.sh client-config.sh token calico.yaml
