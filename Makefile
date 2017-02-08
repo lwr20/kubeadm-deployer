@@ -92,7 +92,7 @@ gce-make-cluster: token
 	$(MAKE) --no-print-directory create-master
 	$(MAKE) --no-print-directory join-nodes
 
-gce-apply-calico:
+gce-apply-calico: calico.yaml
 	gcloud compute copy-files calico.yaml $(PREFIX)-master:~/calico.yaml
 	gcloud compute ssh $(PREFIX)-master -- kubectl apply -f ~/calico.yaml
 	if [ $(KDD) = "true" ]; \
