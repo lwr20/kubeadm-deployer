@@ -17,7 +17,7 @@ NODE_NAMES:=$(addprefix $(PREFIX)-,$(NODE_NUMBERS))
 TOKEN?=$(shell cat token)
 
 CNI_VERSION = v1.5.6
-NODE_VERSION = v2.1.0-rc3
+NODE_VERSION = v1.1.0-rc3
 POLICY_VERSION = v0.5.2   # Not used for KDD
 
 token:
@@ -97,7 +97,7 @@ gce-apply-calico:
 	gcloud compute ssh $(PREFIX)-master -- kubectl apply -f ~/calico.yaml
 	if [ $(KDD) = "true" ]; \
 	  then gcloud compute ssh $(PREFIX)-master -- \
-	  kubectl create -f https://github.com/coreos/flannel/blob/master/Documentation/kube-flannel.yml?raw=true"; \
+	  kubectl create -f https://github.com/coreos/flannel/blob/master/Documentation/kube-flannel.yml?raw=true; \
 	fi
 
 gce-cleanup:
