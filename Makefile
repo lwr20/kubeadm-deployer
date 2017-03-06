@@ -10,15 +10,15 @@ PREFIX?=kubetest
 MASTER_INSTANCE_TYPE?=n1-standard-4
 CLIENT_INSTANCE_TYPE?=n1-standard-1
 KDD?=false
+CNI_VERSION?=v1.5.6
+NODE_VERSION?=v1.1.0-rc3
+POLICY_VERSION?=v0.5.2   # Not used for KDD
+
 -include local-settings.mk
 
 NODE_NUMBERS:=$(shell seq -f '%02.0f' 1 $(NUM_CLIENTS))
 NODE_NAMES:=$(addprefix $(PREFIX)-,$(NODE_NUMBERS))
 TOKEN?=$(shell cat token)
-
-CNI_VERSION = v1.5.6
-NODE_VERSION = v1.1.0-rc3
-POLICY_VERSION = v0.5.2   # Not used for KDD
 
 token:
 	echo "Creating token"
