@@ -126,5 +126,5 @@ gce-forward-ports:
 	@echo "- Kubernetes' API at http://localhost:8080/"
 
 clean:
-	$(MAKE) --no-print-directory gce-cleanup
-	rm -f master-install.sh client-config.sh token calico.yaml
+	-$(MAKE) --no-print-directory gce-cleanup
+	-rm -f master-install.sh client-config.sh token calico.yaml
