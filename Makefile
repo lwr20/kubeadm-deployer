@@ -11,8 +11,9 @@ MASTER_INSTANCE_TYPE?=n1-standard-4
 CLIENT_INSTANCE_TYPE?=n1-standard-1
 KDD?=false
 CNI_VERSION?=v1.5.6
-NODE_VERSION?=v1.1.0-rc3
+NODE_VERSION?=v1.1.0-rc6
 POLICY_VERSION?=v0.5.2   # Not used for KDD
+K8S_VERSION?=v1.5.4      # Latest stable.  Alternatively, try: v1.6.0-alpha.0
 
 -include local-settings.mk
 
@@ -76,7 +77,7 @@ deploy-clients: client-config.sh
 
 create-master: token
 	@echo Token is: $(TOKEN)
-	gcloud compute ssh $(PREFIX)-master -- sudo kubeadm init --token=$(TOKEN) --pod-network-cidr=10.244.0.0/16
+	gcloud compute ssh $(PREFIX)-master -- sudo kubeadm init --use-kubernetes-version=$(K8S_VERSION) --token=$(TOKEN) --pod-network-cidr=10.244.0.0/16
 
 join-nodes: token
 	@echo Token is: $(TOKEN)
