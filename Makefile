@@ -10,8 +10,12 @@ PREFIX?=kubetest
 MASTER_INSTANCE_TYPE?=n1-standard-4
 CLIENT_INSTANCE_TYPE?=n1-standard-1
 KDD?=false
+CNI_CONT?=calico/cni
 CNI_VERSION?=v1.5.6
-NODE_VERSION?=v1.1.0-rc6
+CTL_CONT?=calico/ctl
+NODE_CONT?=quay.io/calico/node
+NODE_VERSION?=v1.1.0
+POLICY_CONT?=calico/kube-policy-controller
 POLICY_VERSION?=v0.5.2   # Not used for KDD
 K8S_VERSION?=v1.5.4      # Latest stable.  Alternatively, try: v1.6.0-alpha.0
 
@@ -35,10 +39,16 @@ calico.yaml:
 	if [ $(KDD) = "true" ]; \
 	then cat "calico-kdd.template.yaml" | \
 	  sed "s~__NODE_VERSION__~$(NODE_VERSION)~g" | \
+	  sed "s~__NODE_CONT__~$(NODE_CONT)~g" | \
+	  sed "s~__CNI_CONT__~$(CNI_CONT)~g" | \
 	  sed "s~__CNI_VERSION__~$(CNI_VERSION)~g" > $@; \
 	else cat "calico-etcd.template.yaml" | \
 	  sed "s~__NODE_VERSION__~$(NODE_VERSION)~g" | \
+	  sed "s~__NODE_CONT__~$(NODE_CONT)~g" | \
+	  sed "s~__CTL_CONT__~$(CTL_CONT)~g" | \
+	  sed "s~__POLICY_CONT__~$(POLICY_CONT)~g" | \
 	  sed "s~__POLICY_VERSION__~$(POLICY_VERSION)~g" | \
+	  sed "s~__CNI_CONT__~$(CNI_CONT)~g" | \
 	  sed "s~__CNI_VERSION__~$(CNI_VERSION)~g" > $@; \
 	fi
 

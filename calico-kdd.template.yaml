@@ -59,7 +59,7 @@ spec:
         # container programs network policy and routes on each
         # host.
         - name: calico-node
-          image: calico/node:__NODE_VERSION__
+          image: __NODE_CONT__:__NODE_VERSION__
           env:
             # Use Kubernetes API as the backing datastore.
             - name: DATASTORE_TYPE
@@ -96,7 +96,7 @@ spec:
         # This container installs the Calico CNI binaries
         # and CNI network config file on each node.
         - name: install-cni
-          image: calico/cni:__CNI_VERSION__
+          image: __CNI_CONT__:__CNI_VERSION__
           command: ["/install-cni.sh"]
           env:
             # The CNI network config to install on each node.
