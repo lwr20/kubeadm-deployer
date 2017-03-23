@@ -10,7 +10,7 @@ apt-get install -y docker.io
 
 # Allow insecure registry
 cat <<EOF >> /etc/default/docker
-DOCKER_OPTS="--insecure-registry persist-docker-reg-tigera-enterprise:5000"
+DOCKER_OPTS="--insecure-registry jenkins-containers:5000"
 EOF
 service docker restart
 apt-get install -y kubelet kubeadm kubectl kubernetes-cni
