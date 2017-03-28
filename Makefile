@@ -18,6 +18,7 @@ NODE_VERSION?=v1.1.0
 POLICY_CONT?=calico/kube-policy-controller
 POLICY_VERSION?=v0.5.2   # Not used for KDD
 K8S_VERSION?=v1.5.4      # Latest stable.  Alternatively, try: v1.6.0-alpha.0
+FLANNEL_VER?=v0.7.0
 
 -include local-settings.mk
 
@@ -108,7 +109,7 @@ gce-apply-calico: calico.yaml
 	gcloud compute ssh $(PREFIX)-master -- kubectl apply -f ~/calico.yaml
 	if [ $(KDD) = "true" ]; \
 	  then gcloud compute ssh $(PREFIX)-master -- \
-	  kubectl create -f https://github.com/coreos/flannel/blob/master/Documentation/kube-flannel.yml?raw=true; \
+	  kubectl create -f https://raw.githubusercontent.com/coreos/flannel/$(FLANNEL_VER)/Documentation/kube-flannel.yml; \
 	fi
 
 gce-cleanup:
