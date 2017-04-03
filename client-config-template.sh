@@ -13,4 +13,4 @@ cat <<EOF >> /etc/default/docker
 DOCKER_OPTS="--insecure-registry jenkins-containers:5000"
 EOF
 service docker restart
-apt-get install -y kubelet kubeadm kubectl kubernetes-cni
+apt-get install -y kubelet kubeadm=1.5.6-00 kubectl kubernetes-cni
