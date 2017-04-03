@@ -7,7 +7,7 @@ echo UUID=`sudo blkid -s UUID -o value /dev/disk/by-id/google-local-ssd-0` /var/
 
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
 cat <<EOF > /etc/apt/sources.list.d/kubernetes.list
-deb http://apt.kubernetes.io/ kubernetes-xenial main
+deb http://apt.kubernetes.io/ kubernetes-xenial-unstable main
 EOF
 apt-get update
 # Install docker if you don't have it already.
@@ -26,7 +26,7 @@ spec:
   datastoreType: "etcdv2"
   etcdEndpoints: "http://10.96.232.136:6666"
 EOF
-apt-get install -y kubelet kubeadm=1.5.6-00 kubectl kubernetes-cni
+apt-get install -y kubelet kubeadm kubectl kubernetes-cni
 
 # get etcdctl 2.3.7
 curl -L  https://github.com/coreos/etcd/releases/download/v2.3.7/etcd-v2.3.7-linux-amd64.tar.gz -o etcd-v2.3.7-linux-amd64.tar.gz
