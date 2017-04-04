@@ -17,7 +17,7 @@ NODE_CONT?=quay.io/calico/node
 NODE_VERSION?=v1.1.0
 POLICY_CONT?=calico/kube-policy-controller
 POLICY_VERSION?=v0.5.2   # Not used for KDD
-K8S_VERSION?=v1.5.4      # Latest stable.  Alternatively, try: v1.6.0-alpha.0
+K8S_VERSION?=v1.6.1      # One which works and is supported by current version of kubeadm
 FLANNEL_VER?=v0.7.0
 
 -include local-settings.mk
@@ -88,13 +88,14 @@ deploy-clients: client-config.sh
 
 create-master: token
 	@echo Token is: $(TOKEN)
-	gcloud compute ssh $(PREFIX)-master -- sudo kubeadm init --use-kubernetes-version=$(K8S_VERSION) --token=$(TOKEN) --pod-network-cidr=10.244.0.0/16
+	gcloud compute ssh $(PREFIX)-master -- sudo kubeadm init --kubernetes-version=$(K8S_VERSION) --token=$(TOKEN) --pod-network-cidr=10.244.0.0/16
+	gcloud compute ssh $(PREFIX)-master -- "mkdir -p ~/.kube && sudo cp /etc/kubernetes/admin.conf /home/$(USER)/.kube/config && sudo chown $(USER):$(USER) /home/$(USER)/.kube/config"
 
 join-nodes: token
 	@echo Token is: $(TOKEN)
 	for NODE in ${NODE_NAMES}; do \
 	  echo "Joining $$NODE"; \
-	  gcloud compute ssh $$NODE -- sudo kubeadm join --token=$(TOKEN) $(PREFIX)-master & \
+	  gcloud compute ssh $$NODE -- sudo kubeadm join --token=$(TOKEN) $(PREFIX)-master:6443 & \
 	done; \
 	echo "Waiting for join of nodes to finish..."; \
 	wait; \
