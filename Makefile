@@ -110,7 +110,7 @@ gce-apply-calico: calico.yaml
 	gcloud compute ssh $(PREFIX)-master -- kubectl apply -f ~/calico.yaml
 	if [ $(KDD) = "true" ]; \
 	  then gcloud compute ssh $(PREFIX)-master -- \
-	  kubectl create -f https://raw.githubusercontent.com/coreos/flannel/$(FLANNEL_VER)/Documentation/kube-flannel.yml; \
+	  "kubectl create -f https://raw.githubusercontent.com/coreos/flannel/$(FLANNEL_VER)/Documentation/kube-flannel.yml && kubectl create -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel-rbac.yml"; \
 	fi
 
 gce-cleanup:
